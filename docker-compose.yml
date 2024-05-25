@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.4
+    container_name: mysql_container
+    environment:
+      MYSQL_ROOT_PASSWORD: Welcome@123
+      MYSQL_DATABASE: empdb
+    ports:
+      - "3306:3306"
+    networks:
+      - emp-network
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  app:
+    image: emp-spring:latest
+    container_name: emp_spring_container
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/empdb
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Welcome@123
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - emp-network
+
+networks:
+  emp-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
